@@ -8,22 +8,14 @@
     android:background="@color/pink_pastel_background"
     tools:context=".UcapanActivity">
 
-    <ImageView
-        android:id="@+id/imageViewBubuDudu"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="20dp"
-        android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@+id/textViewHeader"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:contentDescription="Bubu Dudu GIF" />
-
     <TextView
         android:id="@+id/textViewHeader"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
         android:text="Selamat Ulang Tahun, Nela Sayangku Cintaku Manisku Kekasihku!"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -31,6 +23,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageViewBubuDudu1"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="32dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@+id/textViewHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        android:contentDescription="Bubu Dudu GIF Kiri" />
+
+    <ImageView
+        android:id="@+id/imageViewBubuDudu2"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="32dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@+id/textViewHeader"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:contentDescription="Bubu Dudu GIF Kanan" />
 
     <TextView
         android:id="@+id/textViewUcapan"
@@ -45,6 +59,20 @@
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewBubuDudu" />
+        app:layout_constraintTop_toBottomOf="@+id/imageViewBubuDudu1" />
+
+    <TextView
+        android:id="@+id/textViewSignature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="— Yang Mulia"
+        android:textSize="20sp"
+        android:textStyle="italic"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
