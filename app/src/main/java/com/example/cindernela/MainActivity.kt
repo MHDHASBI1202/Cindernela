@@ -1,5 +1,6 @@
 package com.example.cindernela
 
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,7 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cindernela.ui.theme.CindernelaTheme
 import kotlinx.coroutines.delay
-import androidx.compose.ui.platform.LocalResources
+import coil.compose.rememberAsyncImagePainter
+import coil.decode.ImageDecoderDecoder
+import coil.request.ImageRequest
+
 
 class MainActivity : ComponentActivity() {
     private var mediaPlayer: MediaPlayer? = null
@@ -36,18 +41,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Inisialisasi dan mulai putar musik
+        // Hentikan dan bebaskan pemutar media sebelumnya
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+
+        // 1. PERBAIKAN MUSIK: Gunakan AudioAttributes untuk volume yang benar
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA) // Tentukan sebagai media/musik
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+
         mediaPlayer = MediaPlayer.create(this, R.raw.hbd)
-        mediaPlayer?.isLooping = true // Putar musik secara looping
+        mediaPlayer?.setAudioAttributes(audioAttributes) // Terapkan atribut audio
+        mediaPlayer?.isLooping = true // Memastikan musik berulang
+
+        // Atur volume ke MAKSIMUM (1.0f)
+        mediaPlayer?.setVolume(1.0f, 1.0f)
+
         mediaPlayer?.start()
 
         setContent {
             CindernelaTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    BirthdayScreen(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                BirthdayScreen(
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
@@ -60,7 +77,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// 1. Definisikan daftar gambar dan ucapan
+// Data gambar dan ucapan
 val imageIds = listOf(
     R.drawable.yay1, R.drawable.yay2, R.drawable.yay3, R.drawable.yay4, R.drawable.yay5,
     R.drawable.yay6, R.drawable.yay7, R.drawable.yay8, R.drawable.yay9, R.drawable.yay10,
@@ -76,7 +93,7 @@ val imageIds = listOf(
     R.drawable.yay56, R.drawable.yay57, R.drawable.yay58, R.drawable.yay59, R.drawable.yay60,
     R.drawable.yay61, R.drawable.yay62, R.drawable.yay63, R.drawable.yay64, R.drawable.yay65,
     R.drawable.yay66, R.drawable.yay67, R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
-    // Ulangi daftar untuk memastikan scroll looping terlihat mulus (70 gambar lagi)
+    // Ulangi daftar untuk scrolling loop yang mulus
     R.drawable.yay1, R.drawable.yay2, R.drawable.yay3, R.drawable.yay4, R.drawable.yay5,
     R.drawable.yay6, R.drawable.yay7, R.drawable.yay8, R.drawable.yay9, R.drawable.yay10,
     R.drawable.yay11, R.drawable.yay12, R.drawable.yay13, R.drawable.yay14, R.drawable.yay15,
@@ -93,49 +110,74 @@ val imageIds = listOf(
     R.drawable.yay66, R.drawable.yay67, R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
 )
 
-val birthdayMessages = listOf(
-    "Selamat ulang tahun, Sayang! Kaulah hadiah terindah dalam hidupku. 💖",
-    "Semoga harimu dipenuhi tawa dan kebahagiaan. Aku mencintaimu! ✨",
-    "Untuk ratu di hatiku, semoga semua impianmu tercapai. 👑",
-    "Setiap tahun bersamamu adalah sebuah petualangan. Happy Birthday! 😊",
-    "Terima kasih sudah menjadi dirimu. Selamat ulang tahun, cintaku. ❤️"
+val birthdayItems = listOf(
+    Pair("Selamat ulang tahun, Sayang! Kaulah hadiah terindah dalam hidupku. 💖", R.drawable.bd5),
+    Pair("Semoga harimu dipenuhi tawa dan kebahagiaan. Aku mencintaimu! ✨", R.drawable.bd4),
+    Pair("Untuk ratu di hatiku, semoga semua impianmu tercapai. 👑", R.drawable.bd1),
+    Pair("Setiap tahun bersamamu adalah sebuah petualangan. Happy Birthday! 😊", R.drawable.bd2),
+    Pair("Terima kasih sudah menjadi dirimu. Selamat ulang tahun, cintaku. ❤️", R.drawable.bd3)
 )
 
-// 2. Composable untuk layar utama
+// Composable untuk menampilkan GIF menggunakan Coil
+@Composable
+fun GifImage(
+    gifResId: Int,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit
+) {
+    val context = LocalContext.current
+    val imageRequest = ImageRequest.Builder(context)
+        .data(gifResId)
+        .decoderFactory(ImageDecoderDecoder.Factory())
+        .build()
+
+    val painter = rememberAsyncImagePainter(imageRequest)
+
+    Image(
+        painter = painter,
+        contentDescription = null,
+        modifier = modifier,
+        contentScale = contentScale
+    )
+}
+
+
+// Composable untuk layar utama
 @Composable
 fun BirthdayScreen(modifier: Modifier = Modifier) {
     // State untuk mengelola index pesan yang sedang ditampilkan
-    var currentMessageIndex by remember { mutableIntStateOf(0) }
-    val message = birthdayMessages[currentMessageIndex]
+    var currentMessageIndex by remember { mutableStateOf(0) }
+    val currentItem = birthdayItems[currentMessageIndex]
+    val message = currentItem.first
+    val gifResId = currentItem.second
 
-    // State dan CoroutineScope untuk auto-scroll
+    // State untuk auto-scroll
     val listState = rememberLazyListState()
-    val totalUniqueImages = imageIds.size / 2 // Jumlah gambar unik (misalnya 70)
+    val totalUniqueImages = imageIds.size / 2
 
     // Logika Auto-Scroll Looping
     LaunchedEffect(Unit) {
-        // 1. Scroll cepat ke posisi awal (di tengah daftar yang digandakan)
-        // Ini memungkinkan scrolling ke bawah dan juga ke atas jika diperlukan
+        // Scroll cepat ke posisi awal (di tengah daftar yang digandakan)
         listState.scrollToItem(totalUniqueImages)
 
-        // 2. Auto-Scroll ke bawah secara perlahan
         while(true) {
+
+            // PERBAIKAN SCROLL: Kita tidak perlu memeriksa isScrollInProgress
+            // karena kita akan menonaktifkan userScrollEnabled.
             val nextIndex = listState.firstVisibleItemIndex + 1
 
-            // Cek apakah sudah mendekati akhir dari duplikasi pertama (misalnya 5 item terakhir)
-            // Jika sudah, "teleport" kembali ke bagian tengah list untuk looping tanpa terlihat berkedip
             if (listState.firstVisibleItemIndex >= imageIds.size - 5) {
+                // Teleport kembali ke tengah list
                 listState.scrollToItem(totalUniqueImages)
-                continue // Lanjutkan ke iterasi berikutnya
+            } else {
+                // Animasi scroll ke item berikutnya
+                listState.animateScrollToItem(
+                    index = nextIndex,
+                    scrollOffset = 0
+                )
             }
 
-            // 3. Animasi scroll ke item berikutnya (lebih lambat)
-            listState.animateScrollToItem(
-                index = nextIndex,
-                scrollOffset = 0
-            )
-
-            // 4. Menggunakan delay untuk mengontrol kecepatan scroll (1.5 detik per gambar)
+            // Menggunakan delay 1.5 detik per gambar.
             delay(1500)
         }
     }
@@ -143,35 +185,46 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            // 3. Tambahkan clickable untuk mengganti teks
+            // Tambahkan clickable untuk mengganti teks
             .clickable {
                 // Ganti pesan ke pesan berikutnya (looping)
-                currentMessageIndex = (currentMessageIndex + 1) % birthdayMessages.size
+                currentMessageIndex = (currentMessageIndex + 1) % birthdayItems.size
             }
     ) {
         // Lapisan 1: Scrolling Gambar
+        // PERBAIKAN SCROLL: Menggunakan userScrollEnabled = false agar tidak bisa disentuh manual
         ImageScrollBackground(listState)
 
-        // Lapisan 2: Overlay Teks (Semi Transparan dan Ganti Teks)
+        // Lapisan 2: Overlay Teks dan GIF (Semi Transparan)
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = message,
-                // Latar belakang semi-transparan
+            Column(
                 modifier = Modifier
                     .background(
                         Color.Black.copy(alpha = 0.5f), // Hitam 50% transparan
                         MaterialTheme.shapes.medium
                     )
                     .padding(24.dp),
-                color = Color.White,
-                fontSize = 24.sp,
-                textAlign = TextAlign.Center
-            )
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Tampilkan GIF
+                GifImage(
+                    gifResId = gifResId,
+                    modifier = Modifier.size(100.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                // Tampilkan Teks
+                Text(
+                    text = message,
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -179,10 +232,15 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
 // Composable untuk menampilkan list gambar yang bisa di-scroll
 @Composable
 fun ImageScrollBackground(listState: LazyListState) {
+    val context = LocalContext.current
+    val screenHeightDp = (context.resources.displayMetrics.heightPixels / context.resources.displayMetrics.density).dp
+
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(0.dp)
+        contentPadding = PaddingValues(0.dp),
+        // **PERBAIKAN SCROLL**: Menonaktifkan scroll pengguna
+        userScrollEnabled = false
     ) {
         items(imageIds.size) { index ->
             Image(
@@ -191,8 +249,7 @@ fun ImageScrollBackground(listState: LazyListState) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    // Memastikan gambar memenuhi tinggi layar agar scrolling terlihat jelas
-                    .height(LocalResources.current.displayMetrics.heightPixels.dp / LocalResources.current.displayMetrics.density)
+                    .height(screenHeightDp) // Pastikan gambar memenuhi tinggi layar
             )
         }
     }
