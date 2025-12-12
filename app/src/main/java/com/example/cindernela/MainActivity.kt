@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cindernela.ui.theme.CindernelaTheme
-import com.example.cindernela.ui.theme.PastelPinkPrimary // Impor warna pink pastel
+import com.example.cindernela.ui.theme.PastelPinkPrimary
 import kotlinx.coroutines.delay
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.ImageDecoderDecoder
@@ -201,36 +201,54 @@ val imageIds = listOf(
 // R.drawable.bd3: Bear mencium (❤️)
 
 val birthdayItems = listOf(
-    Pair("Selamat ulang tahun, Sayang! Kaulah hadiah terindah dalam hidupku. 💖", R.drawable.bd5),
-    Pair("Semoga harimu dipenuhi tawa dan kebahagiaan. Aku mencintaimu! ✨", R.drawable.bd4),
-    Pair("Untuk ratu di hatiku, semoga semua impianmu tercapai. 👑", R.drawable.bd1),
-    Pair("Setiap tahun bersamamu adalah sebuah petualangan. Happy Birthday! 😊", R.drawable.bd2),
-    Pair("Terima kasih sudah menjadi dirimu. Selamat ulang tahun, cintaku. ❤️", R.drawable.bd3),
+    Pair("Selamat 21 Happy tahun birthday yang ke 21💖", R.drawable.bd5),
+    Pair("itulah pokoknnya yawww ✨", R.drawable.bd4),
+    Pair("Semoga sehat selalu, Aaaamiiinn 👑", R.drawable.bd1),
+    Pair("Semoga rezekinya lancar selalu, Aaaamiiinn😊", R.drawable.bd2),
+    Pair("Semoga segala urusannya dimudahkan selalu, Aaaamiiinn ❤️", R.drawable.bd3),
+
+    Pair("Ini udah kepo aja apa udah kepo banget?💖", R.drawable.bd5),
+    Pair("Mencetnya pelan-pelan ya, jangan cepet-cepet, nanti ke skip ✨", R.drawable.bd4),
+    Pair("...", R.drawable.bd1),
+    Pair("Pasti kepo banget yawww 😊", R.drawable.bd2),
+    Pair("Gaada apa-apa si, cuma mau bilang... ❤️", R.drawable.bd3),
+
+    Pair("Selamat ulang tahun, Sayang atu yang paling atu sayangi 💖", R.drawable.bd5),
+    Pair("Semoga di umur yang sekarang bisa jauh lebih baik agi yawww ✨", R.drawable.bd4),
+    Pair("Semoga semua keinginan tamu dan kita tercapai yaw. Aaaamiiinn 👑", R.drawable.bd1),
+    Pair("Setiap bersama tamu ada banyak cerita yang gamungkin bisa dilupain. Happy Birthday My Love! 😊", R.drawable.bd2),
+    Pair("Maaciw udh selalu jadi yang terbaik yaaww. Selamat ulang tahun, cintaku. ❤️", R.drawable.bd3),
     // Tambahan 15 Ucapan baru untuk mencapai 20 total
-    Pair("Hari ini adalah hari istimewamu, sama istimewanya dirimu bagiku. 💖", R.drawable.bd5),
-    Pair("Aku sangat beruntung memilikimu. Happy Birthday! ✨", R.drawable.bd4),
-    Pair("Semoga hidupmu selalu indah dan penuh berkah. Selamat ulang tahun! 👑", R.drawable.bd1),
-    Pair("Aku tak bisa membayangkan hidup tanpamu. Happy Birthday, Cintaku. 😊", R.drawable.bd2),
-    Pair("Cinta terbaikku lahir hari ini. Selamat ulang tahun! ❤️", R.drawable.bd3),
+    Pair("Maaciw udah jadi sosok bocil yang selalu bikin rame hidup atu 💖", R.drawable.bd5),
+    Pair("Maaciw udah jadi sosok wanita yang dewasa(walau kadang-kadang aja cuma) yang supportif ✨", R.drawable.bd4),
+    Pair("Maaciw udah jadi yang selalu ada buat dengerin sisi lainnya atu 👑", R.drawable.bd1),
+    Pair("Maaciw udah jadi alasan atu untuk tidak boleh pasrah dan menyerah 😊", R.drawable.bd2),
+    Pair("Maaciw udah jadi sandaran saat atu udah gakuat berdiri ❤️", R.drawable.bd3),
 
-    Pair("Selamat ulang tahun, Sayang. Semoga semua yang terbaik menyertaimu. 💖", R.drawable.bd5),
-    Pair("Mari kita buat hari ini tak terlupakan. Love you! ✨", R.drawable.bd4),
-    Pair("Kau pantas mendapatkan semua kebahagiaan di dunia ini. Happy Birthday! 👑", R.drawable.bd1),
-    Pair("Senyummu adalah kado terindah bagiku. Selamat ulang tahun! 😊", R.drawable.bd2),
-    Pair("Kau adalah segalanya. Selamat ulang tahun, Sayangku. ❤️", R.drawable.bd3),
+    Pair("Maaciw udah jadi orang yang sabar dengerin hal-hal aneh dari mulut sampah ini 💖", R.drawable.bd5),
+    Pair("Maaciw udah jadi orang yang mau ikutan berkembang sama atu yang belum bisa ngapa-ngapain ✨", R.drawable.bd4),
+    Pair("Maaciw udah mau jalan beriringan dengan pria biasa ini👑", R.drawable.bd1),
+    Pair("Maaciw udah lahir dan memilih atu untuk bisa sama tamu 😊", R.drawable.bd2),
+    Pair("Cinta terbaikku lahir ternyata pas shopee gini. Selamat ulang tahun sayang! ❤️", R.drawable.bd3),
 
-    Pair("Satu tahun lagi bersamamu. Tak sabar untuk tahun-tahun berikutnya! 💖", R.drawable.bd5),
-    Pair("Waktuku bersamamu adalah favoritku. Happy Birthday, my love! ✨", R.drawable.bd4),
-    Pair("Tetaplah bersinar, Ratu hatiku. Selamat ulang tahun! 👑", R.drawable.bd1),
-    Pair("Semua yang kamu sentuh menjadi emas. Selamat ulang tahun, Yay! 😊", R.drawable.bd2),
-    Pair("Terima kasih telah mewarnai hidupku. ❤️", R.drawable.bd3),
+    Pair("Kalau bukan sama tamu, wadooo udah gatu lagi deh 💖", R.drawable.bd5),
+    Pair("Ya cuma ini dan itu(benda pink) aja yang bisa atu kasih untuk sekarang. Sorry and Love you! ✨", R.drawable.bd4),
+    Pair("Hadiahnya udah dibuka belom? harusnya kan baca ini dulu ya baru boleh buka 👑", R.drawable.bd1),
+    Pair("Gaboleh curang loh ya, tamu biasanya curangnyoooii 😊", R.drawable.bd2),
+    Pair("Pokoknya atu cuma mau minta maaf karena hadiahnya ga seberapa ❤️", R.drawable.bd3),
+
+    Pair("Minta maaf juga karena gabisa jadi romantis kayak orang-orang, tapi atu usahain kok 💖", R.drawable.bd5),
+    Pair("Minta maaf juga belom ngasih apa-apa yang berarti kali ✨", R.drawable.bd4),
+    Pair("Tapi atu usahain kedepannya yaa sayang yaa 👑", R.drawable.bd1),
+    Pair("Tapi tamu temenin ya, masa tega ninggalin atu sendirian, ga kan? 😊", R.drawable.bd2),
+    Pair("Masih banyak impian tamu, atu, dan kita yang belum tercapai. ❤️", R.drawable.bd3),
 
     // 5 Item tambahan untuk total 20
-    Pair("Dirimu adalah alasan terbesar untuk tersenyum. Selamat ulang tahun. 💖", R.drawable.bd5),
-    Pair("Semoga hari ini secerah hatimu. Happy Birthday! ✨", R.drawable.bd4),
-    Pair("Bertambah dewasa, bertambah manis. Selamat ulang tahun! 👑", R.drawable.bd1),
-    Pair("Tak ada yang bisa menggantikanmu. Happy Birthday! 😊", R.drawable.bd2),
-    Pair("Cintaku, selamat ulang tahun ke-20! ❤️", R.drawable.bd3)
+    Pair("Jalan kedepannya masih panjaaannggggggggggg kaliiiiii💖", R.drawable.bd5),
+    Pair("Kita usahain semuanya bareng ya, cuma atu, tamu, dan kita✨", R.drawable.bd4),
+    Pair("Karena ada seseorang yang nyadarin atu, impian tu gaada yang rendah atau tinggi 👑", R.drawable.bd1),
+    Pair("Semua mimpi punya arti dan punya jalannya masing-masing 😊", R.drawable.bd2),
+    Pair("Cintaku, selamat ulang tahun yang ke-100 eh ke-21! ❤️", R.drawable.bd3)
 )
 
 // Composable untuk menampilkan GIF menggunakan Coil
