@@ -99,6 +99,11 @@ class MainActivity : ComponentActivity() {
 // =========================================================================================
 @Composable
 fun WelcomeScreen(onTapToContinue: () -> Unit, modifier: Modifier = Modifier) {
+    // Ambil semua GIF IDs dari birthdayItems
+    val allGifIds = remember { birthdayItems.map { it.second } }
+    val topGifs = allGifIds.take(3)
+    val bottomGifs = allGifIds.takeLast(2)
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -108,13 +113,26 @@ fun WelcomeScreen(onTapToContinue: () -> Unit, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            // 3 GIF di atas tulisan "Aloo, selamat datang yay"
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+            ) {
+                topGifs.forEach { gifId ->
+                    GifImage(gifResId = gifId, modifier = Modifier.size(80.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Text(
                 text = "Aloo, selamat datang yay",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
@@ -124,6 +142,18 @@ fun WelcomeScreen(onTapToContinue: () -> Unit, modifier: Modifier = Modifier) {
                 color = Color.White.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 2 GIF di bawah tulisan "tekan kalau kepo"
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 64.dp)
+            ) {
+                bottomGifs.forEach { gifId ->
+                    GifImage(gifResId = gifId, modifier = Modifier.size(80.dp))
+                }
+            }
         }
     }
 }
@@ -163,12 +193,44 @@ val imageIds = listOf(
     R.drawable.yay66, R.drawable.yay67, R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
 )
 
+// Data GIF yang sudah ada
+// R.drawable.bd5: Bear dengan mawar & mahkota (💖)
+// R.drawable.bd4: Bear berpelukan (✨)
+// R.drawable.bd1: Bear dengan kue ultah (👑)
+// R.drawable.bd2: Bear berpegangan tangan (😊)
+// R.drawable.bd3: Bear mencium (❤️)
+
 val birthdayItems = listOf(
     Pair("Selamat ulang tahun, Sayang! Kaulah hadiah terindah dalam hidupku. 💖", R.drawable.bd5),
     Pair("Semoga harimu dipenuhi tawa dan kebahagiaan. Aku mencintaimu! ✨", R.drawable.bd4),
     Pair("Untuk ratu di hatiku, semoga semua impianmu tercapai. 👑", R.drawable.bd1),
     Pair("Setiap tahun bersamamu adalah sebuah petualangan. Happy Birthday! 😊", R.drawable.bd2),
-    Pair("Terima kasih sudah menjadi dirimu. Selamat ulang tahun, cintaku. ❤️", R.drawable.bd3)
+    Pair("Terima kasih sudah menjadi dirimu. Selamat ulang tahun, cintaku. ❤️", R.drawable.bd3),
+    // Tambahan 15 Ucapan baru untuk mencapai 20 total
+    Pair("Hari ini adalah hari istimewamu, sama istimewanya dirimu bagiku. 💖", R.drawable.bd5),
+    Pair("Aku sangat beruntung memilikimu. Happy Birthday! ✨", R.drawable.bd4),
+    Pair("Semoga hidupmu selalu indah dan penuh berkah. Selamat ulang tahun! 👑", R.drawable.bd1),
+    Pair("Aku tak bisa membayangkan hidup tanpamu. Happy Birthday, Cintaku. 😊", R.drawable.bd2),
+    Pair("Cinta terbaikku lahir hari ini. Selamat ulang tahun! ❤️", R.drawable.bd3),
+
+    Pair("Selamat ulang tahun, Sayang. Semoga semua yang terbaik menyertaimu. 💖", R.drawable.bd5),
+    Pair("Mari kita buat hari ini tak terlupakan. Love you! ✨", R.drawable.bd4),
+    Pair("Kau pantas mendapatkan semua kebahagiaan di dunia ini. Happy Birthday! 👑", R.drawable.bd1),
+    Pair("Senyummu adalah kado terindah bagiku. Selamat ulang tahun! 😊", R.drawable.bd2),
+    Pair("Kau adalah segalanya. Selamat ulang tahun, Sayangku. ❤️", R.drawable.bd3),
+
+    Pair("Satu tahun lagi bersamamu. Tak sabar untuk tahun-tahun berikutnya! 💖", R.drawable.bd5),
+    Pair("Waktuku bersamamu adalah favoritku. Happy Birthday, my love! ✨", R.drawable.bd4),
+    Pair("Tetaplah bersinar, Ratu hatiku. Selamat ulang tahun! 👑", R.drawable.bd1),
+    Pair("Semua yang kamu sentuh menjadi emas. Selamat ulang tahun, Yay! 😊", R.drawable.bd2),
+    Pair("Terima kasih telah mewarnai hidupku. ❤️", R.drawable.bd3),
+
+    // 5 Item tambahan untuk total 20
+    Pair("Dirimu adalah alasan terbesar untuk tersenyum. Selamat ulang tahun. 💖", R.drawable.bd5),
+    Pair("Semoga hari ini secerah hatimu. Happy Birthday! ✨", R.drawable.bd4),
+    Pair("Bertambah dewasa, bertambah manis. Selamat ulang tahun! 👑", R.drawable.bd1),
+    Pair("Tak ada yang bisa menggantikanmu. Happy Birthday! 😊", R.drawable.bd2),
+    Pair("Cintaku, selamat ulang tahun ke-20! ❤️", R.drawable.bd3)
 )
 
 // Composable untuk menampilkan GIF menggunakan Coil
