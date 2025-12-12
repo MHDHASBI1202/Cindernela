@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +14,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,36 +47,54 @@ import coil.request.ImageRequest
 
 class MainActivity : ComponentActivity() {
     private var mediaPlayer: MediaPlayer? = null
+    private var isMusicPlaying = true // State untuk melacak status musik
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Hentikan dan bebaskan pemutar media sebelumnya
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
-
-        // PERBAIKAN MUSIK: Gunakan AudioAttributes untuk volume yang benar
-        val audioAttributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_MEDIA)
-            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-            .build()
-
-        mediaPlayer = MediaPlayer.create(this, R.raw.hbd)
-        mediaPlayer?.setAudioAttributes(audioAttributes)
-        mediaPlayer?.isLooping = true // Memastikan musik berulang
-
-        // Atur volume ke MAKSIMUM (1.0f)
-        mediaPlayer?.setVolume(1.0f, 1.0f)
-
-        mediaPlayer?.start()
+        setupMediaPlayer()
 
         setContent {
             // State untuk mengelola perpindahan layar (Welcome Screen vs Birthday Screen)
             var showWelcomeScreen by remember { mutableStateOf(true) }
+            // State untuk mengontrol musik dari Compose
+            var uiMusicPlaying by remember { mutableStateOf(isMusicPlaying) }
+
+            // Function untuk toggle musik
+            val toggleMusic: () -> Unit = {
+                if (mediaPlayer?.isPlaying == true) {
+                    mediaPlayer?.pause()
+                    isMusicPlaying = false
+                } else {
+                    mediaPlayer?.start()
+                    isMusicPlaying = true
+                }
+                uiMusicPlaying = isMusicPlaying // Update UI state
+            }
+
+            // Memastikan musik mencerminkan status awal saat Compose diluncurkan
+            LaunchedEffect(uiMusicPlaying) {
+                if (uiMusicPlaying && mediaPlayer?.isPlaying != true) {
+                    mediaPlayer?.start()
+                } else if (!uiMusicPlaying && mediaPlayer?.isPlaying == true) {
+                    mediaPlayer?.pause()
+                }
+            }
 
             CindernelaTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    floatingActionButton = {
+                        // Tampilkan kontrol musik hanya pada BirthdayScreen
+                        if (!showWelcomeScreen) {
+                            MusicControlFab(
+                                isPlaying = uiMusicPlaying,
+                                onClick = toggleMusic
+                            )
+                        }
+                    }
+                ) { innerPadding ->
                     if (showWelcomeScreen) {
                         // Tampilkan Welcome Screen
                         WelcomeScreen(
@@ -86,13 +112,90 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun setupMediaPlayer() {
+        // Hentikan dan bebaskan pemutar media sebelumnya
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+
+        // PERBAIKAN MUSIK: Gunakan AudioAttributes untuk volume yang benar
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+            .build()
+
+        mediaPlayer = MediaPlayer.create(this, R.raw.hbd)
+        mediaPlayer?.setAudioAttributes(audioAttributes)
+        mediaPlayer?.isLooping = true // Memastikan musik berulang
+
+        // Atur volume ke MAKSIMUM (1.0f)
+        mediaPlayer?.setVolume(1.0f, 1.0f)
+
+        if (isMusicPlaying) {
+            mediaPlayer?.start()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // Hentikan dan bebaskan sumber daya MediaPlayer saat Activity dihancurkan
         mediaPlayer?.stop()
         mediaPlayer?.release()
+        mediaPlayer = null
     }
 }
+
+// =========================================================================================
+// 1. COMPOSABLE BARU: Music Control Floating Action Button (FAB)
+// =========================================================================================
+@Composable
+fun MusicControlFab(isPlaying: Boolean, onClick: () -> Unit) {
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = PastelPinkPrimary,
+        contentColor = Color.White
+    ) {
+        Icon(
+            imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+            contentDescription = if (isPlaying) "Pause Music" else "Play Music"
+        )
+    }
+}
+
+
+// =========================================================================================
+// 2. COMPOSABLE BARU: Special End Screen
+// =========================================================================================
+@Composable
+fun SpecialEndScreen(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            // Overlay hitam yang tebal untuk fokus ke pesan
+            .background(Color.Black.copy(alpha = 0.9f))
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Happy 21 My Lovely Girl",
+                color = Color.White,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(16.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            // Teks final yang diminta
+            Text(
+                text = "Continued in 12.02",
+                color = PastelPinkPrimary,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
 
 // =========================================================================================
 // 3. COMPOSABLE BARU: Welcome Screen
@@ -280,9 +383,26 @@ fun GifImage(
 fun BirthdayScreen(modifier: Modifier = Modifier) {
     // State untuk mengelola index pesan yang sedang ditampilkan
     var currentMessageIndex by remember { mutableStateOf(0) }
+    val totalMessages = birthdayItems.size
+
+    // State baru untuk mengelola tampilan layar penutup
+    var showEndScreen by remember { mutableStateOf(false) }
+
     val currentItem = birthdayItems[currentMessageIndex]
-    val message = currentItem.first
-    val gifResId = currentItem.second
+
+    // Logika untuk navigasi pesan
+    val onNextMessage = {
+        if (currentMessageIndex == totalMessages - 1) {
+            // Jika pesan terakhir, pindah ke layar penutup
+            showEndScreen = true
+        } else {
+            // Jika belum pesan terakhir, lanjut ke pesan berikutnya
+            currentMessageIndex += 1
+        }
+    }
+    val onPreviousMessage = {
+        currentMessageIndex = if (currentMessageIndex > 0) currentMessageIndex - 1 else 0
+    }
 
     // State untuk auto-scroll
     val listState = rememberLazyListState()
@@ -309,46 +429,111 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
     }
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            // Tambahkan clickable untuk mengganti teks
-            .clickable {
-                // Ganti pesan ke pesan berikutnya (looping)
-                currentMessageIndex = (currentMessageIndex + 1) % birthdayItems.size
-            }
+        modifier = modifier.fillMaxSize()
     ) {
-        // Lapisan 1: Scrolling Gambar
+        // Lapisan 1: Scrolling Gambar (tetap berjalan di latar belakang)
         ImageScrollBackground(listState)
 
-        // Lapisan 2: Overlay Teks dan GIF (Semi Transparan)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
+        // Lapisan 2: Overlay Konten (Pesan atau Penutup Khusus)
+        if (showEndScreen) {
+            SpecialEndScreen(modifier = Modifier.fillMaxSize())
+        } else {
+            // Content for standard message view
+            Box(
                 modifier = Modifier
-                    .background(
-                        Color.Black.copy(alpha = 0.5f), // Hitam 50% transparan
-                        MaterialTheme.shapes.medium
-                    )
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize()
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center
             ) {
-                // Tampilkan GIF
-                GifImage(
-                    gifResId = gifResId,
-                    modifier = Modifier.size(100.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                // Tampilkan Teks
-                Text(
-                    text = message,
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center
-                )
+                Column(
+                    modifier = Modifier
+                        .background(
+                            Color.Black.copy(alpha = 0.5f), // Hitam 50% transparan
+                            MaterialTheme.shapes.medium
+                        )
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Indikator Pesan
+                    Text(
+                        text = "Pesan ${currentMessageIndex + 1} dari $totalMessages",
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Light,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+
+                    // Tampilkan GIF dan Teks dengan Crossfade (Pergantian Transisi Halus)
+                    Crossfade(targetState = currentItem, label = "message_crossfade") { item ->
+                        val fullMessage = item.first
+                        // State untuk menahan teks yang sedang di-typing
+                        var displayedText by remember { mutableStateOf("") }
+
+                        // Efek Mengetik: Dijalankan ulang setiap kali item (pesan/GIF) berubah
+                        LaunchedEffect(fullMessage) {
+                            displayedText = "" // Reset teks
+                            for (i in fullMessage.indices) {
+                                displayedText += fullMessage[i]
+                                delay(40) // Kecepatan mengetik: 40ms per karakter
+                            }
+                        }
+
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            // Tampilkan GIF
+                            GifImage(
+                                gifResId = item.second,
+                                modifier = Modifier.size(100.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            // Tampilkan Teks yang sedang dianimasikan
+                            Text(
+                                text = displayedText,
+                                color = Color.White,
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Kontrol Navigasi (Previous dan Next/Finish)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        // Tombol 'Previous' hanya muncul jika bukan pesan pertama
+                        if (currentMessageIndex > 0) {
+                            Button(
+                                onClick = onPreviousMessage,
+                                colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = PastelPinkPrimary.copy(alpha = 0.8f))
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Message")
+                                Spacer(Modifier.width(8.dp))
+                                Text("Sebelumnya")
+                            }
+                        } else {
+                            // Placeholder (Spacer kecil) agar tombol 'Selanjutnya' tetap di kanan
+                            Spacer(modifier = Modifier.size(1.dp))
+                        }
+
+                        // Teks tombol diubah berdasarkan index
+                        val isLastMessage = currentMessageIndex == totalMessages - 1
+                        val buttonText = if (isLastMessage) "Selesaikan" else "Selanjutnya"
+
+                        Button(
+                            onClick = onNextMessage, // Menggunakan logika onNextMessage yang sudah diperbarui
+                            colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = PastelPinkPrimary)
+                        ) {
+                            Text(buttonText)
+                            Spacer(Modifier.width(8.dp))
+                            // Hanya tampilkan ikon panah jika BUKAN tombol Selesaikan
+                            if (!isLastMessage) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Message")
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -372,6 +557,8 @@ fun ImageScrollBackground(listState: LazyListState) {
                 painter = painterResource(id = imageIds[index]),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
+                // Beri sedikit opacity agar overlay teks lebih dominan
+                alpha = 0.8f,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(screenHeightDp)
