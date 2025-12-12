@@ -167,7 +167,7 @@ fun MusicControlFab(isPlaying: Boolean, onClick: () -> Unit) {
 
 
 // =========================================================================================
-// 2. COMPOSABLE BARU: Special End Screen dengan Animasi
+// 2. COMPOSABLE BARU: Special End Screen dengan Animasi (Disesuaikan)
 // =========================================================================================
 @Composable
 fun SpecialEndScreen(modifier: Modifier = Modifier) {
@@ -219,7 +219,7 @@ fun SpecialEndScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             // Overlay hitam yang tebal untuk fokus ke pesan
             .background(Color.Black.copy(alpha = 0.9f))
-            .padding(32.dp),
+            .padding(24.dp), // Padding dikurangi sedikit
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -228,7 +228,7 @@ fun SpecialEndScreen(modifier: Modifier = Modifier) {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(12.dp) // Padding dikurangi
                     .wrapContentWidth()
             ) {
                 chars.forEachIndexed { index, char ->
@@ -248,7 +248,7 @@ fun SpecialEndScreen(modifier: Modifier = Modifier) {
                     Text(
                         text = char,
                         color = Color.White,
-                        fontSize = 32.sp,
+                        fontSize = 28.sp, // Ukuran diperkecil (dari 32.sp)
                         fontFamily = FontFamily.Default, // Ensure a default font is used
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -262,7 +262,7 @@ fun SpecialEndScreen(modifier: Modifier = Modifier) {
                 }
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(40.dp)) // Jarak dikurangi
 
             // FADE IN GIFS & TEXT (Appears after falling text is done)
             Column(
@@ -273,20 +273,20 @@ fun SpecialEndScreen(modifier: Modifier = Modifier) {
                 // GIF Row
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp) // Padding horizontal dikurangi
                 ) {
                     endScreenGifs.forEach { gifId ->
-                        GifImage(gifResId = gifId, modifier = Modifier.size(60.dp)) // Smaller GIFs for End Screen
+                        GifImage(gifResId = gifId, modifier = Modifier.size(50.dp)) // Ukuran GIF diperkecil (dari 60.dp)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp)) // Jarak dikurangi
 
                 // Final Text
                 Text(
                     text = "Continued in 12.02",
                     color = PastelPinkPrimary,
-                    fontSize = 28.sp,
+                    fontSize = 24.sp, // Ukuran diperkecil (dari 28.sp)
                     fontWeight = FontWeight.ExtraBold,
                 )
             }
@@ -389,11 +389,11 @@ val imageIds = listOf(
     R.drawable.yay33, R.drawable.yay34, R.drawable.yay35, R.drawable.yay36, R.drawable.yay37,
     R.drawable.yay38, R.drawable.yay39, R.drawable.yay40, R.drawable.yay41, R.drawable.yay42,
     R.drawable.yay43, R.drawable.yay44, R.drawable.yay45, R.drawable.yay46, R.drawable.yay47,
-    R.drawable.yay48, R.drawable.yay49, R.drawable.yay50, R.drawable.yay51, R.drawable.yay52,
-    R.drawable.yay53, R.drawable.yay54, R.drawable.yay55, R.drawable.yay56, R.drawable.yay57,
-    R.drawable.yay58, R.drawable.yay59, R.drawable.yay60, R.drawable.yay61, R.drawable.yay62,
-    R.drawable.yay63, R.drawable.yay64, R.drawable.yay65, R.drawable.yay66, R.drawable.yay67,
-    R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
+    R.drawable.yay48, R.drawable.yay49, R.drawable.yay50,
+    R.drawable.yay51, R.drawable.yay52, R.drawable.yay53, R.drawable.yay54, R.drawable.yay55,
+    R.drawable.yay56, R.drawable.yay57, R.drawable.yay58, R.drawable.yay59, R.drawable.yay60,
+    R.drawable.yay61, R.drawable.yay62, R.drawable.yay63, R.drawable.yay64, R.drawable.yay65,
+    R.drawable.yay66, R.drawable.yay67, R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
 )
 
 // Data GIF yang sudah ada
@@ -551,7 +551,7 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
                             Color.Black.copy(alpha = 0.5f), // Hitam 50% transparan
                             MaterialTheme.shapes.medium
                         )
-                        .padding(24.dp),
+                        .padding(20.dp), // Padding dikurangi dari 24.dp
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Indikator Pesan
@@ -582,20 +582,20 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
                             // Tampilkan GIF
                             GifImage(
                                 gifResId = item.second,
-                                modifier = Modifier.size(100.dp)
+                                modifier = Modifier.size(80.dp) // Ukuran diperkecil (dari 100.dp)
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(12.dp)) // Jarak diperkecil
                             // Tampilkan Teks yang sedang dianimasikan
                             Text(
                                 text = displayedText,
                                 color = Color.White,
-                                fontSize = 24.sp,
+                                fontSize = 20.sp, // Ukuran diperkecil (dari 24.sp)
                                 textAlign = TextAlign.Center
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp)) // Jarak diperkecil
 
                     // Kontrol Navigasi (Previous dan Next/Finish)
                     Row(
@@ -606,11 +606,13 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
                         if (currentMessageIndex > 0) {
                             Button(
                                 onClick = onPreviousMessage,
+                                // Content padding is implicitly handled by Button size, focusing on text/icon size for smaller buttons
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = PastelPinkPrimary.copy(alpha = 0.8f))
                             ) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Message")
-                                Spacer(Modifier.width(8.dp))
-                                Text("Sebelumnya")
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Previous Message", modifier = Modifier.size(20.dp)) // Ikon diperkecil
+                                Spacer(Modifier.width(4.dp)) // Jarak diperkecil
+                                Text("Sebelumnya", fontSize = 14.sp) // Teks diperkecil
                             }
                         } else {
                             // Placeholder (Spacer kecil) agar tombol 'Selanjutnya' tetap di kanan
@@ -623,13 +625,14 @@ fun BirthdayScreen(modifier: Modifier = Modifier) {
 
                         Button(
                             onClick = onNextMessage, // Menggunakan logika onNextMessage yang sudah diperbarui
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                             colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = PastelPinkPrimary)
                         ) {
-                            Text(buttonText)
-                            Spacer(Modifier.width(8.dp))
+                            Text(buttonText, fontSize = 14.sp) // Teks diperkecil
+                            Spacer(Modifier.width(4.dp)) // Jarak diperkecil
                             // Hanya tampilkan ikon panah jika BUKAN tombol Selesaikan
                             if (!isLastMessage) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Message")
+                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Next Message", modifier = Modifier.size(20.dp)) // Ikon diperkecil
                             }
                         }
                     }
