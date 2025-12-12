@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,9 +31,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -163,10 +167,53 @@ fun MusicControlFab(isPlaying: Boolean, onClick: () -> Unit) {
 
 
 // =========================================================================================
-// 2. COMPOSABLE BARU: Special End Screen
+// 2. COMPOSABLE BARU: Special End Screen dengan Animasi
 // =========================================================================================
 @Composable
 fun SpecialEndScreen(modifier: Modifier = Modifier) {
+
+    // 1. Setup untuk Falling Text
+    val mainText = "Happy 21 My Lovely"
+    // Pisahkan teks menjadi karakter tunggal
+    val chars = remember { mainText.map { it.toString() } }
+
+    // State untuk alpha (0f/1f) dan vertical offset (Y) untuk setiap karakter.
+    // Inisialisasi: alpha 0, offset Y -50 (di atas)
+    val charTargetValues = remember {
+        mutableStateListOf<Pair<Float, Float>>().apply {
+            repeat(chars.size) { add(0f to -50f) }
+        }
+    }
+
+    // 2. Setup untuk Fade In GIF & Text
+    var isFinalContentVisible by remember { mutableStateOf(false) }
+
+    // GIFs to display on end screen
+    val endScreenGifs = remember {
+        listOf(R.drawable.bd5, R.drawable.bd4, R.drawable.bd1, R.drawable.bd2, R.drawable.bd3)
+    }
+
+    // Animasikan teks jatuh
+    LaunchedEffect(Unit) {
+        chars.forEachIndexed { index, _ ->
+            // Staggered delay (100ms per karakter)
+            delay(index * 100L)
+            charTargetValues[index] = 1f to 0f // Target: alpha 1, offset Y 0 (posisi akhir)
+        }
+
+        // Atur delay untuk konten final (setelah animasi utama selesai)
+        val totalDelayMs = chars.size * 100L + 500
+        delay(totalDelayMs)
+        isFinalContentVisible = true // Triggers the final content fade in
+    }
+
+    // Animate alpha untuk efek fade-in pada konten final (GIFs dan Teks)
+    val finalAlpha by animateFloatAsState(
+        targetValue = if (isFinalContentVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 1000), // 1 detik fade in
+        label = "finalContentFade"
+    )
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -176,22 +223,73 @@ fun SpecialEndScreen(modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = "Happy 21 My Lovely Girl",
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp)
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            // Teks final yang diminta
-            Text(
-                text = "Continued in 12.02",
-                color = PastelPinkPrimary,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.ExtraBold
-            )
+
+            // FALLING TEXT Container (Happy 21 My Lovely)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .wrapContentWidth()
+            ) {
+                chars.forEachIndexed { index, char ->
+                    // Animasi properti dari state
+                    val alphaState by animateFloatAsState(
+                        targetValue = charTargetValues[index].first,
+                        animationSpec = tween(durationMillis = 500, delayMillis = 0),
+                        label = "charAlpha${index}"
+                    )
+
+                    val offsetY by animateFloatAsState(
+                        targetValue = charTargetValues[index].second,
+                        animationSpec = tween(durationMillis = 500, delayMillis = 0),
+                        label = "charOffsetY${index}"
+                    )
+
+                    Text(
+                        text = char,
+                        color = Color.White,
+                        fontSize = 32.sp,
+                        fontFamily = FontFamily.Default, // Ensure a default font is used
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        // Gunakan graphicsLayer untuk animasi performa tinggi
+                        modifier = Modifier.graphicsLayer(
+                            alpha = alphaState,
+                            // Angka 5 adalah multiplier untuk membuat gerakan jatuh lebih terlihat
+                            translationY = offsetY * 5
+                        )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // FADE IN GIFS & TEXT (Appears after falling text is done)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                // Apply Fade In to the whole final block
+                modifier = Modifier.graphicsLayer(alpha = finalAlpha)
+            ) {
+                // GIF Row
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+                ) {
+                    endScreenGifs.forEach { gifId ->
+                        GifImage(gifResId = gifId, modifier = Modifier.size(60.dp)) // Smaller GIFs for End Screen
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Final Text
+                Text(
+                    text = "Continued in 12.02",
+                    color = PastelPinkPrimary,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                )
+            }
         }
     }
 }
@@ -283,17 +381,19 @@ val imageIds = listOf(
     R.drawable.yay1, R.drawable.yay2, R.drawable.yay3, R.drawable.yay4, R.drawable.yay5,
     R.drawable.yay6, R.drawable.yay7, R.drawable.yay8, R.drawable.yay9, R.drawable.yay10,
     R.drawable.yay11, R.drawable.yay12, R.drawable.yay13, R.drawable.yay14, R.drawable.yay15,
-    R.drawable.yay16, R.drawable.yay17, R.drawable.yay18, R.drawable.yay19, R.drawable.yay20,
-    R.drawable.yay21, R.drawable.yay22, R.drawable.yay23, R.drawable.yay24, R.drawable.yay25,
-    R.drawable.yay26, R.drawable.yay27, R.drawable.yay28, R.drawable.yay29, R.drawable.yay30,
-    R.drawable.yay31, R.drawable.yay32, R.drawable.yay33, R.drawable.yay34, R.drawable.yay35,
-    R.drawable.yay36, R.drawable.yay37, R.drawable.yay38, R.drawable.yay39, R.drawable.yay40,
-    R.drawable.yay41, R.drawable.yay42, R.drawable.yay43, R.drawable.yay44, R.drawable.yay45,
-    R.drawable.yay46, R.drawable.yay47, R.drawable.yay48, R.drawable.yay49, R.drawable.yay50,
-    R.drawable.yay51, R.drawable.yay52, R.drawable.yay53, R.drawable.yay54, R.drawable.yay55,
-    R.drawable.yay56, R.drawable.yay57, R.drawable.yay58, R.drawable.yay59, R.drawable.yay60,
-    R.drawable.yay61, R.drawable.yay62, R.drawable.yay63, R.drawable.yay64, R.drawable.yay65,
-    R.drawable.yay66, R.drawable.yay67, R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
+    R.drawable.yay16, R.drawable.yay17,
+    // Baris ini sengaja dihilangkan untuk menghemat ruang dan fokus pada kode yang diperbaiki
+    R.drawable.yay18, R.drawable.yay19, R.drawable.yay20, R.drawable.yay21, R.drawable.yay22,
+    R.drawable.yay23, R.drawable.yay24, R.drawable.yay25, R.drawable.yay26, R.drawable.yay27,
+    R.drawable.yay28, R.drawable.yay29, R.drawable.yay30, R.drawable.yay31, R.drawable.yay32,
+    R.drawable.yay33, R.drawable.yay34, R.drawable.yay35, R.drawable.yay36, R.drawable.yay37,
+    R.drawable.yay38, R.drawable.yay39, R.drawable.yay40, R.drawable.yay41, R.drawable.yay42,
+    R.drawable.yay43, R.drawable.yay44, R.drawable.yay45, R.drawable.yay46, R.drawable.yay47,
+    R.drawable.yay48, R.drawable.yay49, R.drawable.yay50, R.drawable.yay51, R.drawable.yay52,
+    R.drawable.yay53, R.drawable.yay54, R.drawable.yay55, R.drawable.yay56, R.drawable.yay57,
+    R.drawable.yay58, R.drawable.yay59, R.drawable.yay60, R.drawable.yay61, R.drawable.yay62,
+    R.drawable.yay63, R.drawable.yay64, R.drawable.yay65, R.drawable.yay66, R.drawable.yay67,
+    R.drawable.yay68, R.drawable.yay69, R.drawable.yay70,
 )
 
 // Data GIF yang sudah ada
@@ -337,7 +437,7 @@ val birthdayItems = listOf(
     Pair("Kalau bukan sama tamu, wadooo udah gatu lagi deh 💖", R.drawable.bd5),
     Pair("Ya cuma ini dan itu(benda pink) aja yang bisa atu kasih untuk sekarang. Sorry and Love you! ✨", R.drawable.bd4),
     Pair("Hadiahnya udah dibuka belom? harusnya kan baca ini dulu ya baru boleh buka 👑", R.drawable.bd1),
-    Pair("Gaboleh curang loh ya, tamu biasanya curangnyoooii 😊", R.drawable.bd2),
+    Pair("Gaboleh curang loh ya, tamu biasanya curangnyoooii. Dengerin lagunya sampe habis yaww 😊", R.drawable.bd2),
     Pair("Pokoknya atu cuma mau minta maaf karena hadiahnya ga seberapa ❤️", R.drawable.bd3),
 
     Pair("Minta maaf juga karena gabisa jadi romantis kayak orang-orang, tapi atu usahain kok 💖", R.drawable.bd5),
