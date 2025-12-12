@@ -356,7 +356,7 @@ fun ImageScrollBackground(listState: LazyListState) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(screenHeightDp) // Pastikan gambar memenuhi tinggi layar
+                    .height(screenHeightDp)
             )
         }
     }
